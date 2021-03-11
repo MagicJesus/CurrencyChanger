@@ -1,4 +1,12 @@
-head,
 body {
-  height: 100%;
+  background: whitesmoke;
+  position: relative;
+}
+
+.root {
+  background: whitesmoke;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 10%);
 }

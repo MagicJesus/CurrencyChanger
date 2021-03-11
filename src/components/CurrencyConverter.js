@@ -1,8 +1,10 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TextField from "@material-ui/core/TextField";
 import CurrencySelector from "./CurrencySelector";
 import { round } from "mathjs";
+import { api } from "../services/api";
+import MyPlot from "./MyPlot";
 
 const CurrencyConverter = () => {
   const [currency, setCurrency] = useState("/gbp");
@@ -10,14 +12,46 @@ const CurrencyConverter = () => {
   const [amount, setAmount] = useState("");
   const [amountPln, setAmountPln] = useState("");
   const [kurs, setKurs] = useState(0);
+  const [historyRates, setHistoryRates] = useState([]);
+
+  useEffect(() => {
+    let currencyCode = currency.slice(1, 4).toUpperCase();
+
+    if (currency !== "" && code !== currencyCode) {
+      api
+        .get(currency + "/last/30")
+        .then((res) => {
+          if (res.status === 200) {
+            setHistoryRates(res.data.rates);
+            setCode(res.data.code);
+            setKurs(res.data.rates[res.data.rates.length - 1].mid);
+          }
+        })
+        .catch((err) => window.alert(err));
+    }
+  });
 
   function handleChange(event) {
+    let amountString = event.target.value;
+
+    let decimalDigits = calculateDecimalDigits(amountString);
+
     try {
-      let amount = parseFloat(event.target.value);
-      console.log(amount);
-      if (!Number.isNaN(amount)) {
-        setAmount(amount);
-        setAmountPln(round(amount * kurs, 3));
+      let amount = parseFloat(amountString);
+
+      if (
+        !Number.isNaN(amount) &&
+        amountString[amountString.length - 1] === "."
+      ) {
+        if (amountString.match(/\./g || []).length === 1) {
+          setAmount(amountString);
+          setAmountPln(round(amount * kurs, 4));
+        }
+      } else if (!Number.isNaN(amount)) {
+        if (decimalDigits < 5) {
+          setAmount(amount);
+          setAmountPln(round(amount * kurs, 4));
+        }
       } else {
         setAmount("");
         setAmountPln("");
@@ -28,11 +62,25 @@ const CurrencyConverter = () => {
   }
 
   function handlePlnChange(event) {
+    let amountString = event.target.value;
+
+    let decimalDigits = calculateDecimalDigits(amountString);
+
     try {
-      let amount = parseFloat(event.target.value);
-      if (!Number.isNaN(amount)) {
-        setAmount(round(amount / kurs, 3));
-        setAmountPln(amount);
+      let amount = parseFloat(amountString);
+      if (
+        !Number.isNaN(amount) &&
+        amountString[amountString.length - 1] === "."
+      ) {
+        if (amountString.match(/\./g || []).length === 1) {
+          setAmountPln(amountString);
+          setAmount(round(amount / kurs, 4));
+        }
+      } else if (!Number.isNaN(amount)) {
+        if (decimalDigits < 5) {
+          setAmount(round(amount / kurs, 4));
+          setAmountPln(amount);
+        }
       } else {
         setAmount("");
         setAmountPln("");
@@ -42,8 +90,21 @@ const CurrencyConverter = () => {
     }
   }
 
+  function calculateDecimalDigits(string) {
+    let counting = false;
+    let ctr = 0;
+    for (let i = 0; i < string.length; i++) {
+      if (string[i] === ".") {
+        counting = true;
+      } else if (counting) {
+        ctr += 1;
+      }
+    }
+    return ctr;
+  }
+
   return (
-    <div className="field-wrapper">
+    <div>
       <div className="field">
         <CurrencySelector
           currency={currency}
@@ -75,6 +136,9 @@ const CurrencyConverter = () => {
       <p>
         1 {code} = {kurs} PLN
       </p>
+      <div>
+        <MyPlot data={historyRates} code={code} />
+      </div>
     </div>
   );
 };
