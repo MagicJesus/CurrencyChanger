@@ -19,3 +19,6 @@ npm start
 ```
 
 This will start the development server on your localhost:3000
+
+## Live version
+[Currency Changer](https://currency-changer-1.netlify.app/)
