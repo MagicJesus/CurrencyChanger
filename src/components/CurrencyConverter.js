@@ -1,12 +1,24 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import TextField from "@material-ui/core/TextField";
-import CurrencySelector from "./CurrencySelector";
 import { round } from "mathjs";
 import { api } from "../services/api";
+import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import CurrencySelector from "./CurrencySelector";
 import MyPlot from "./MyPlot";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import CurrencyFlag from "react-currency-flags";
+
+const useStyles = makeStyles((theme) => ({
+  margin: { margin: theme.spacing(1) },
+  textField: {
+    width: "34ch",
+  },
+}));
 
 const CurrencyConverter = () => {
+  const classes = useStyles();
+
   const [currency, setCurrency] = useState("/gbp");
   const [code, setCode] = useState("");
   const [amount, setAmount] = useState("");
@@ -118,8 +130,19 @@ const CurrencyConverter = () => {
       <div className="field">
         <TextField
           id="foreign"
-          label={code}
+          label="You send"
           variant="outlined"
+          className={(classes.margin, classes.textField)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">{code}</InputAdornment>
+            ),
+            startAdornment: (
+              <InputAdornment position="start">
+                <CurrencyFlag currency={code} width={21} height={14} />
+              </InputAdornment>
+            ),
+          }}
           value={amount}
           onChange={handleChange}
         />
@@ -127,8 +150,17 @@ const CurrencyConverter = () => {
       <div className="field">
         <TextField
           id="domestic"
-          label="PLN"
+          label="They receive"
           variant="outlined"
+          className={(classes.margin, classes.textField)}
+          InputProps={{
+            endAdornment: <InputAdornment position="end">PLN</InputAdornment>,
+            startAdornment: (
+              <InputAdornment position="start">
+                <CurrencyFlag currency="PLN" width={21} height={14} />
+              </InputAdornment>
+            ),
+          }}
           value={amountPln}
           onChange={handlePlnChange}
         />

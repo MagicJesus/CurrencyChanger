@@ -9,15 +9,21 @@
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "axios": "^0.21.1",
+    "chart.js": "^2.9.4",
+    "currency-symbol-map": "^5.0.1",
     "mathjs": "^9.2.0",
     "plotly.js": "^1.58.4",
     "react": "^17.0.1",
+    "react-chartjs-2": "^2.11.1",
+    "react-currency-flags": "^0.1.2",
     "react-dom": "^17.0.1",
-    "react-plotly.js": "^2.5.1",
     "react-scripts": "4.0.3",
-    "web-vitals": "^1.0.1"
+    "source-map-explorer": "^2.5.2",
+    "web-vitals": "^1.0.1",
+    "webpack-bundle-analyzer": "^4.4.0"
   },
   "scripts": {
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
